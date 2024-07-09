@@ -230,15 +230,15 @@
                 <section id="contact">
                     <div class="container mil-p-120-90">
                         <h3 class="mil-center mil-up mil-mb-120">Let's <span class="mil-thin">Talk</span></h3>
-                        <form class="row align-items-center">
+                        <form class="row align-items-center" method="post" action="send_email.php">
                             <div class="col-lg-6 mil-up">
-                                <input type="text" placeholder="What's your name">
+                                <input type="text" name="name" placeholder="What's your name" required>
                             </div>
                             <div class="col-lg-6 mil-up">
-                                <input type="email" placeholder="Your Email">
+                                <input type="email" name="email" placeholder="Your Email" required>
                             </div>
                             <div class="col-lg-12 mil-up">
-                                <textarea placeholder="Tell us about our project"></textarea>
+                                <textarea name="message" placeholder="Tell us about our project" required></textarea>
                             </div>
                             <div class="col-lg-8">
                                 <p class="mil-up mil-mb-30"><span class="mil-accent">*</span> We promise not to disclose your personal information to third parties.</p>
@@ -338,7 +338,7 @@
                                     <div class="mil-vert-between">
                                         <div class="mil-mb-30">
                                             <ul class="mil-social-icons mil-up">
-                                                <li><a href="https://wa.me/1234567890?text=Hello" target="_blank" class="social-icon"> <i class="fab fa-whatsapp-square"></i></a></li>
+                                                <li><a href="https://wa.me/+923326069812?text=Hello" target="_blank" class="social-icon"> <i class="fab fa-whatsapp-square"></i></a></li>
                                                 <li><a href="https://www.facebook.com/muhammadusman.latif.165?mibextid=LQQJ4d" target="_blank" class="social-icon"> <i class="fab fa-facebook-square"></i></a></li>
                                                 <li><a href="https://www.instagram.com/itz_usman_latif/" target="_blank" class="social-icon"> <i class="fab fa-instagram-square"></i></a></li>
                                                 <li><a href="https://www.linkedin.com/in/m-usman-latif/" target="_blank" class="social-icon"> <i class="fab fa-linkedin-in"></i></a></li>
@@ -465,8 +465,48 @@
         <!-- content -->
     </div>
     <!-- wrapper end -->
-
+    
     <!-- jQuery js -->
+    <?php
+    if ($_SERVER["REQUEST_METHOD"] == "POST") {
+        $name = strip_tags(trim($_POST["name"]));
+        $email = filter_var(trim($_POST["email"]), FILTER_SANITIZE_EMAIL);
+        $message = trim($_POST["message"]);
+
+        // Check that data was sent to the mailer.
+        if ( empty($name) OR empty($message) OR !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            http_response_code(400);
+            echo "Oops! There was a problem with your submission. Please complete the form and try again.";
+            exit;
+        }
+
+        // Set the recipient email address.
+        $recipient = "your_email@example.com"; // Replace with your email address here
+
+        // Set the email subject.
+        $subject = "New message from $name";
+
+        // Build the email content.
+        $email_content = "Name: $name\n";
+        $email_content .= "Email: $email\n\n";
+        $email_content .= "Message:\n$message\n";
+
+        // Build the email headers.
+        $email_headers = "From: $name <$email>";
+
+        // Send the email.
+        if (mail($recipient, $subject, $email_content, $email_headers)) {
+            http_response_code(200);
+            echo "Thank You! Your message has been sent.";
+        } else {
+            http_response_code(500);
+            echo "Oops! Something went wrong and we couldn't send your message.";
+        }
+    } else {
+        http_response_code(403);
+        echo "There was a problem with your submission, please try again.";
+    }
+    ?>
     <script src="js/plugins/jquery.min.js"></script>
     <!-- swup js -->
     <script src="js/plugins/swup.min.js"></script>
